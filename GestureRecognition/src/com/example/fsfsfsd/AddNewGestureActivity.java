@@ -29,7 +29,7 @@ public class AddNewGestureActivity extends Activity{
 	        setContentView(R.layout.activity_new_gesture);
 	    }	 
 	 protected void onActivityResult (int requestCode, int resultCode, Intent data){
-		 ((TextView)this.findViewById(R.id.textView1)).setText(data.toString());
+		 ((TextView)this.findViewById(R.id.vidInfoTitleTV)).setText(data.toString());
 		 Intent actIntent = new Intent(this, ChooseProblemSetsActivity.class);
 	 	 actIntent.setData(data.getData());
 	 	 startActivity(actIntent);
