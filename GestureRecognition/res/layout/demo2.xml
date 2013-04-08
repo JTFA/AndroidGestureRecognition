@@ -4,24 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/vidInfoTitleTV"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="305dp"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_weight="1"
+        android:src="@drawable/ic_launcher" />
 
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Avi"
-        android:onClick="pickAviClick" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Record Gesture"
-        android:onClick="onClick" />
+        android:text="Save"
+        android:onClick="promptsave" />
 
 </LinearLayout>
