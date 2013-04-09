@@ -9,6 +9,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import com.GestureRecognition.Globals;
 import com.GestureRecognition.R;
@@ -30,7 +31,6 @@ import android.widget.ImageView;
 
 public class demo2 extends Activity {
 	private ArrayList<Mat> frames;
-	private ArrayList<Mat> binaryFrames;
 	private  Bitmap bmp;
 	private Mat[] mats;
 	 @Override
@@ -42,13 +42,13 @@ public class demo2 extends Activity {
 	        //Log.d("lastc", frames.get(frames.size()-1).cols()+"");
 	        //Log.d("lastr", frames.get(frames.size()-1).rows()+"");
 	       // frames = (ArrayList<Mat>) getIntent().getSerializableExtra("frames");
-	        binaries();
-	        mats = mhi((char) 50);
 	        
-	        Mat themat = mats[0];
+	        mats = MHI_MEI(gen_frames(60),90);
+	        
+	        Mat mhi = mats[0];
 	        Mat mei = mats[1];
 	        ImageView iv = (ImageView)this.findViewById(R.id.imageView1);
-	        bmp = Bitmap.createBitmap(themat.cols(), themat.rows(),Bitmap.Config.ARGB_8888 );
+	        bmp = Bitmap.createBitmap(mhi.cols(), mhi.rows(),Bitmap.Config.ARGB_8888 );
 	        Utils.matToBitmap(mei,bmp);
 	        //Utils.matToBitmap(frames.get(15),bmp);
 	        
@@ -92,115 +92,97 @@ public class demo2 extends Activity {
 		 
 		 
 	 }
-	 public void binaries(){
-		 binaryFrames = new ArrayList<Mat>();
-		 for(Mat m : frames)
-			 binaryFrames.add(m.clone());
-		 binaryFrames.get(0).setTo(new Scalar(0));
-		 for(int m = 1;m<frames.size()-1;m++){
-			 byte buff[] = new byte[(int) (frames.get(m).total() * frames.get(m).channels())];
-			 byte buffOld[] = new byte[(int) (frames.get(m-1).total() * frames.get(m-1).channels())];
-			 Mat retmat = new Mat(frames.get(m).size(), frames.get(m+1).type());
-			 
-			 Core.subtract( frames.get(m), frames.get(m+1),retmat);
-			 frames.get(m).get(0, 0, buff);
-			 frames.get(m-1).get(0, 0, buffOld);
-			 for (int i = 0; i <  retmat.rows(); i++)
-			    {
-			        for(int j = 0; j < retmat.cols(); j++)
-			        {
-			            //cout << "current value: " << ret.at<char>(i,j) << endl;
 	
-			            if(Math.abs(buff[i*retmat.cols()+j] -buffOld[i*retmat.cols()+j])>40) 
-			            	buff[i*retmat.cols()+j] = (byte) 255;
-			            else 
-			            	buff[i*retmat.cols()+j] = (byte) 0;
-			        }
-			    }
-			 binaryFrames.get(m).put(0, 0, buff);
-		 }
-	 }
-	 public Mat mei(){
-		 return null;
-	 }
-	 	public Mat[] mhi(char tau){
+
+	 	public ArrayList<Mat> gen_frames(int thresh)
+	 	{
+	 		ArrayList<Mat> frame_diff   = new ArrayList<Mat>();
+
+	 		for(int i = 0; i < frames.size()-1; i++ )
+	 		{
+	 			frame_diff.add(FrameDiff(frames.get(i),frames.get(i+1),thresh));
+	 		}
 	 		
-	 		assert(binaryFrames.get(0).type() == CvType.CV_8U);
-
-	 	    Mat mhi = new Mat(binaryFrames.get(0).rows(),binaryFrames.get(0).cols(),CvType.CV_8U);
-	 	    mhi.setTo(new Scalar(0));
-	 	    //mhi.setTo(0);
-	 	     Mat mei = new Mat(binaryFrames.get(0).rows(),binaryFrames.get(0).cols(),CvType.CV_8U);
-	 	    mei.setTo(new Scalar(0));
-
-	 	    ArrayList<Mat> mhis = new ArrayList<Mat>();
-	 	    //Mat mhi = Bs[0].clone();
-	 	    //mhis.push_back(mhi.clone());
-
-
-	 	    //imshow("inner mhi", mhi);
-	 	  
-	 	   
-	 	   byte mbuff[] = new byte[(int) (mhi.total() * mhi.channels())];
-	 	   mhi.get(0, 0,mbuff);
-	 	  byte meibuff[] = new byte[(int) (mei.total() * mei.channels())];
-       	  mei.get(0, 0,meibuff);
-	 	    for(int m = 0; m < binaryFrames.size()/2 ;m++)
-	 	    {
-	 	        //imshow("inner mhi", mhi);
-	 	        //!cout << "Mat results "<< Bs[m] << endl;
-	 	    	byte buff[] = new byte[(int) (binaryFrames.get(m).total() * binaryFrames.get(m).channels())];
-	 	    	binaryFrames.get(m).get(0, 0, buff);
-	 	    	
-	 	    	
-	 	    	
-	 	    	for (int i = 0; i <  binaryFrames.get(m).rows(); i++)
-	 	        {
-	 	            for(int j = 0; j < binaryFrames.get(m).cols(); j++)
-	 	            {
-	 	            	
-	 	                if((buff[(i*binaryFrames.get(m).cols()+j)* binaryFrames.get(m).channels()])== (byte)255)
-	 	                {
-	 	                	
-	 	                    //cout << " " << (int) Bs[m].at<unsigned char>(i,j) << " ";
-	 	                	//byte[] mhiBuff = new byte[(int) mhi.cols() * mhi.channels()];
-	 	                	//mhi.get(i, 0,mhiBuff);
-	 	                	//mhiBuff[j*mhi.channels()] = (byte)tau;
-	 	                	
-	 	                	mbuff[i*mhi.cols() + j] = (byte)tau;
-	 	                	meibuff[i*mei.cols() + j] = (byte)255;
-	 	                	//mhi.put(i, 0,mhiBuff);
-	 	                	
-	 	                	
-	 	                }
-	 	                else
-	 	                {
-	 	                    if(m-1 >=0 && m-1 < binaryFrames.size())
-	 	                    {
-	 	                    	mbuff[i*mhi.cols()+ j]= (byte) Math.max(mbuff[i*mhi.cols()+j]-1,0);
-	 	                    	//byte[] mhiBuff = new byte[(int) mhi.cols() * mhi.channels()];
-	 	                    	//mhis.get(m-1).get(i, 0,mhiBuff);
-	 	                    	//mhiBuff[j*mhi.channels()]= (byte) Math.min(mhiBuff[j]-1,0);
-	 	                    	//mhi.put(i, 0,mhiBuff);
-	 	                    }
-	 	                }
-	 	            }
-	 	        }
-	 	    	
-	 	        //mhis.add(mhi.clone());
-	 	        //imshow("MHI",mhi);
-	 	        //imshow("MEI",mei);
-	 	        //cvWaitKey(0);
-	 	    }
-	 	    mhi.put(0,0,mbuff);
-	 	    mei.put(0,0,meibuff);
-	 	    // #if WRITE
-	 	    //saveFiles(mhis,2,call);
-	 	    //#endif
-	 	    Mat[] retarr = new Mat[2];
-	 	    retarr[0] = mhi;
-	 	    retarr[1] = mei;
-	 	    return retarr;
+	 		return frame_diff;
 	 	}
+	 
+	 	public Mat FrameDiff(final Mat f1, final Mat f2, int thresh)
+	 	{
+	 		Mat t0 = f1.clone(), t1 = f2.clone();
+	 		//Imgproc.cvtColor(t0, t0,  Imgproc.COLOR_RGB2GRAY);
+	 		//Imgproc.cvtColor(t1, t1,  Imgproc.COLOR_RGB2GRAY);
+	 		//t0.convertTo(t0,CvType.CV_16S);
+	 		//t1.convertTo(t1,CvType.CV_16S);
+	 		
+	 		Mat ret = t0.clone().setTo(new Scalar(0));
+	 		Core.subtract(t1, t0, ret);
+	 		
+	 		//short buff[] = new short[(int) (ret.total() * ret.channels())];
+	 		byte buff[] = new byte[(int) (ret.total() * ret.channels())];
+	 		ret.get(0, 0, buff);
+	 		
+	 		for(int row = 1; row < ret.rows(); row++) {
+				for(int col = 0; col < ret.cols(); col++) {
+					
+					//short a = (short) Math.abs(buff[col + row*ret.cols()]);
+					byte a = buff[col + row*ret.cols()];
+					if(a > thresh) buff[col + row*ret.cols()] = (byte) 254;
+					else buff[col + row*ret.cols()] = 0;
+					
+				}
+	 		}
+	 		ret.put(0,0,buff);
+	 		//ret.convertTo(ret, CvType.CV_8U); //TODO might need to convert
+	 		return ret;
+	 	}
+	 	
+	 	public Mat[] MHI_MEI(ArrayList<Mat> Bs, int tau)
+	 	{
+	 		assert(Bs.get(0).type() == CvType.CV_8U);
+			
+	 		ArrayList<byte[]> Mhis = new ArrayList< byte[]>();
+	 		
+			Mat mhi = new Mat(Bs.get(0).size(),CvType.CV_8U);
+			mhi.setTo(new Scalar(0));
+			
+			Mat mei = new Mat(Bs.get(0).size(),CvType.CV_8U);
+			mei.setTo(new Scalar(0));
+			
+			byte bs[] = new byte[(int) (Bs.get(0).total() * Bs.get(0).channels())];
+			
+			byte mhi_arr[] = new byte[(int) (mhi.total() * mhi.channels())];
+			byte mei_arr[] = new byte[(int) (mei.total() *mei.channels())];
+			
+			for(int m = 0; m < Bs.size();m++)
+			{
+				Bs.get(0).get(0, 0,bs);
+				for (int i = 0; i <  Bs.get(m).rows(); i++)
+	 	        {
+	 	            for(int j = 0; j < Bs.get(m).cols(); j++)
+	 	            {
+	 	            	if((bs[(i*Bs.get(m).cols()+j)* Bs.get(m).channels()])== (byte)255)
+	 	            	{
+	 	            		mhi_arr[i*mhi.cols() + j] = (byte)tau;
+	 	            		mei_arr[i*mei.cols() + j] = (byte)tau;
+	 	            	}
+	 	            	else
+	 	            	{
+	 	            		if(m > 0 && m-1 < Bs.size())
+	 	                    {
+	 	            			mhi_arr[i*mhi.cols() + j] = (byte) Math.max(Mhis.get(m-1)[i*mhi.cols() + j]-1,0);
+	 	                    }
+	 	            	}
+	 	            }
+	 	           Mhis.add(mhi_arr);
+	 	        }
+			}
+			mhi.put(0,0,mhi_arr);
+	 	    mei.put(0,0,mei_arr);
+			return new Mat[] {mhi,mei};
+			
+	 	}
+	 	
+	 	
+
 		
 }

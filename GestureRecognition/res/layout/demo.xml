@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:opencv="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,8 +8,8 @@
     <org.opencv.android.JavaCameraView
         android:id="@+id/puzzle_activity_surface_view"
         android:layout_width="fill_parent"
-        android:layout_height="33dp"
-        android:layout_weight="0.08"
+        android:layout_height="match_parent"
+        
         opencv:camera_id="back" />
 
     <LinearLayout
@@ -39,4 +39,4 @@
             android:text="Process" />
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
